@@ -36,6 +36,10 @@
 		12F7830C2210D56D00291614 /* MockableWebSocketClient.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F7830A2210D56D00291614 /* MockableWebSocketClient.generated.swift */; };
 		12FAEE47231EB222003EC62B /* SocketSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12FAEE46231EB222003EC62B /* SocketSpy.swift */; };
 		12FAEE49231EB4B0003EC62B /* FakeTimerQueueSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12FAEE48231EB4B0003EC62B /* FakeTimerQueueSpec.swift */; };
+		9B8234A124C439AA0087A245 /* Channel+Combine+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8234A024C439AA0087A245 /* Channel+Combine+Extensions.swift */; };
+		9B8234A224C439AA0087A245 /* Channel+Combine+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8234A024C439AA0087A245 /* Channel+Combine+Extensions.swift */; };
+		9B8234A724C43CAF0087A245 /* Channel+Combine+Extensions+Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8234A624C43CAF0087A245 /* Channel+Combine+Extensions+Tests.swift */; };
+		9B8234A924C43CCB0087A245 /* PublisherWaitable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8234A824C43CCB0087A245 /* PublisherWaitable.swift */; };
 		9BC1EE8624C40BB200489D2B /* Socket+Combine+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC1EE8524C40BB200489D2B /* Socket+Combine+Extensions.swift */; };
 		9BC1EE8724C40BB200489D2B /* Socket+Combine+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC1EE8524C40BB200489D2B /* Socket+Combine+Extensions.swift */; };
 		9BC1EE8D24C4179400489D2B /* Socket+Combine+Extensions+Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC1EE8A24C4175C00489D2B /* Socket+Combine+Extensions+Tests.swift */; };
@@ -78,6 +82,9 @@
 		12F7830A2210D56D00291614 /* MockableWebSocketClient.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockableWebSocketClient.generated.swift; sourceTree = "<group>"; };
 		12FAEE46231EB222003EC62B /* SocketSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketSpy.swift; sourceTree = "<group>"; };
 		12FAEE48231EB4B0003EC62B /* FakeTimerQueueSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FakeTimerQueueSpec.swift; sourceTree = "<group>"; };
+		9B8234A024C439AA0087A245 /* Channel+Combine+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Channel+Combine+Extensions.swift"; sourceTree = "<group>"; };
+		9B8234A624C43CAF0087A245 /* Channel+Combine+Extensions+Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Channel+Combine+Extensions+Tests.swift"; sourceTree = "<group>"; };
+		9B8234A824C43CCB0087A245 /* PublisherWaitable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublisherWaitable.swift; sourceTree = "<group>"; };
 		9BC1EE8524C40BB200489D2B /* Socket+Combine+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Socket+Combine+Extensions.swift"; sourceTree = "<group>"; };
 		9BC1EE8A24C4175C00489D2B /* Socket+Combine+Extensions+Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Socket+Combine+Extensions+Tests.swift"; sourceTree = "<group>"; };
 		B48458A62164E28500466E32 /* PresenceSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenceSpec.swift; sourceTree = "<group>"; };
@@ -239,6 +246,7 @@
 			isa = PBXGroup;
 			children = (
 				9BC1EE8524C40BB200489D2B /* Socket+Combine+Extensions.swift */,
+				9B8234A024C439AA0087A245 /* Channel+Combine+Extensions.swift */,
 			);
 			path = "Combine+Extensions";
 			sourceTree = "<group>";
@@ -246,7 +254,9 @@
 		9BC1EE8924C416FE00489D2B /* Combine+Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9B8234A824C43CCB0087A245 /* PublisherWaitable.swift */,
 				9BC1EE8A24C4175C00489D2B /* Socket+Combine+Extensions+Tests.swift */,
+				9B8234A624C43CAF0087A245 /* Channel+Combine+Extensions+Tests.swift */,
 			);
 			path = "Combine+Extensions";
 			sourceTree = "<group>";
@@ -401,6 +411,7 @@
 				1203047523B112050012FF2D /* Presence.swift in Sources */,
 				1203047B23B112060012FF2D /* Push.swift in Sources */,
 				1203047923B112060012FF2D /* Channel.swift in Sources */,
+				9B8234A124C439AA0087A245 /* Channel+Combine+Extensions.swift in Sources */,
 				1203047F23B112060012FF2D /* Defaults.swift in Sources */,
 				1203047723B112060012FF2D /* Message.swift in Sources */,
 				1203047D23B112060012FF2D /* Delegated.swift in Sources */,
@@ -414,7 +425,9 @@
 				12FAEE49231EB4B0003EC62B /* FakeTimerQueueSpec.swift in Sources */,
 				124A083521F14BF4003D1400 /* DefaultSerializerSpec.swift in Sources */,
 				12BCCB482210D4D7001A55E1 /* TimeoutTimerSpec.swift in Sources */,
+				9B8234A924C43CCB0087A245 /* PublisherWaitable.swift in Sources */,
 				12A0B0E622317752007ED590 /* FakeTimerQueue.swift in Sources */,
+				9B8234A724C43CAF0087A245 /* Channel+Combine+Extensions+Tests.swift in Sources */,
 				12F7830C2210D56D00291614 /* MockableWebSocketClient.generated.swift in Sources */,
 				12C140D920AF416600184725 /* ChannelSpec.swift in Sources */,
 				120B42CB2223481600FE483D /* MockableClass.generated.swift in Sources */,
@@ -436,6 +449,7 @@
 				1203047623B112050012FF2D /* Presence.swift in Sources */,
 				1203047C23B112060012FF2D /* Push.swift in Sources */,
 				1203047A23B112060012FF2D /* Channel.swift in Sources */,
+				9B8234A224C439AA0087A245 /* Channel+Combine+Extensions.swift in Sources */,
 				1203048023B112060012FF2D /* Defaults.swift in Sources */,
 				1203047823B112060012FF2D /* Message.swift in Sources */,
 				1203047E23B112060012FF2D /* Delegated.swift in Sources */,

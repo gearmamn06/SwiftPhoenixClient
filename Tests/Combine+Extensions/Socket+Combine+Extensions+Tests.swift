@@ -13,17 +13,16 @@ import Starscream
 
 
 @available(iOS 13.0, *)
-class SocketCombineExtensionsTests: XCTestCase {
+class SocketCombineExtensionsTests: XCTestCase, PublisherWaitable {
     
-    private var cancellables: Set<AnyCancellable>!
-    private var mockWebSocket: WebSocketClientMock!
-    private var mockSocketTransport: (((URL) -> WebSocketClient))!
-    private var socket: Socket!
+    var cancellables: Set<AnyCancellable>!
+    var mockWebSocket: WebSocketClientMock!
+    var mockSocketTransport: (((URL) -> WebSocketClient))!
+    var socket: Socket!
     
-    private let timeout: TimeInterval = 0.001
+    let timeout: TimeInterval = 0.001
     
     override func setUp() {
-        super.setUp()
         self.cancellables = []
         self.mockWebSocket = WebSocketClientMock()
         self.mockSocketTransport = { _ in return self.mockWebSocket }
@@ -35,20 +34,19 @@ class SocketCombineExtensionsTests: XCTestCase {
         self.mockWebSocket = nil
         self.mockSocketTransport = nil
         self.socket = nil
-        super.tearDown()
     }
     
-    private func connectWebSocket() {
+    func connectWebSocket() {
         self.mockWebSocket.isConnected = false
         self.socket.connect()
         self.mockWebSocket.delegate?.websocketDidConnect(socket: self.mockWebSocket)
     }
     
-    private func disconnectWebSocket(withError error: Error? = nil) {
+    func disconnectWebSocket(withError error: Error? = nil) {
         self.mockWebSocket.delegate?.websocketDidDisconnect(socket: self.mockWebSocket, error: error)
     }
     
-    private func publishMessage() {
+    func publishMessage() {
         let data: [String: Any] = ["topic":"topic","event":"event","payload":["go": true],"status":"ok"]
         let text = toWebSocketText(data: data)
         mockWebSocket.delegate?.websocketDidReceiveMessage(socket: mockWebSocket, text: text)
@@ -76,6 +74,19 @@ extension SocketCombineExtensionsTests {
         // then
         let expectedEvents: [SocketStatusEvent] = [.onOpen, .onClose, .onClose, .onError(TestError.stub)]
         XCTAssertEqual(events.descriptions, expectedEvents.descriptions)
+    }
+    
+    func testSocket_notLeak() {
+        // given
+        weak var socket: Socket? = Socket("/socket")
+        
+        // when
+        socket?.puboishers.statusEvents
+            .sink(receiveValue: { _ in })
+            .store(in: &self.cancellables)
+        
+        // then
+        XCTAssertNil(socket)
     }
     
     func testSocket_publishOpenEvent() {
@@ -133,26 +144,6 @@ extension SocketCombineExtensionsTests {
         
         // then
         XCTAssertEqual(messages.count, 1)
-    }
-}
-
-
-@available(iOS 13.0, *)
-extension SocketCombineExtensionsTests {
-    
-    private func wait<Output>(_ expect: XCTestExpectation,
-                              source: AnyPublisher<Output, Never>,
-                              action: () -> Void) -> [Output] {
-        var outputs = [Output]()
-        source
-            .sink(receiveValue: { output in
-                outputs.append(output)
-                expect.fulfill()
-            })
-            .store(in: &self.cancellables)
-        action()
-        self.wait(for: [expect], timeout: self.timeout)
-        return outputs
     }
 }
 
