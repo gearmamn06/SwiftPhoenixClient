@@ -55,7 +55,7 @@ extension ChannelCombineExtensionsTests {
         let expect = expectation(description: "join the channel")
         
         // when
-        let result = self.waitResult(expect, source: self.channel.joinThen()) {
+        let result = self.waitPushResult(expect, source: self.channel.join().eraseToAnyPublisher()) {
             self.channel.joinPush?.trigger("ok", payload: [:])
         }
         
@@ -81,7 +81,7 @@ extension ChannelCombineExtensionsTests {
         let expect = expectation(description: "join channel error")
         
         // when
-        let result = self.waitResult(expect, source: self.channel.joinThen()) {
+        let result = self.waitPushResult(expect, source: self.channel.join().eraseToAnyPublisher()) {
             self.channel.joinPush?.trigger("error", payload: [:])
         }
         
@@ -94,7 +94,7 @@ extension ChannelCombineExtensionsTests {
         let expect = expectation(description: "join channel timeout error")
         
         // when
-        let result = self.waitResult(expect, source: self.channel.joinThen()) {
+        let result = self.waitPushResult(expect, source: self.channel.join().eraseToAnyPublisher()) {
             self.channel.joinPush?.trigger("timeout", payload: [:])
         }
         
@@ -107,7 +107,7 @@ extension ChannelCombineExtensionsTests {
         let expect = expectation(description: "leave channel success")
         
         // when
-        let result = self.waitResult(expect, source: self.channel.leaveThen()) { }
+        let result = self.waitPushResult(expect, source: self.channel.leave().eraseToAnyPublisher()) { }
         
         // then
         XCTAssertEqual(result?.isSuccess, true)
@@ -119,9 +119,9 @@ extension ChannelCombineExtensionsTests {
         self.channel.joinedOnce = true
         
         // when
-        let futurePush = self.channel.pushThen("test", payload: [:])
-        let result = self.waitResult(expect, source: futurePush) {
-            futurePush.push.trigger("ok", payload: [:])
+        let push = self.channel.push("test", payload: [:])
+        let result = self.waitPushResult(expect, source: push.eraseToAnyPublisher()) {
+            push.trigger("ok", payload: [:])
         }
         
         // then
@@ -134,9 +134,9 @@ extension ChannelCombineExtensionsTests {
         self.channel.joinedOnce = true
         
         // when
-        let futurePush = self.channel.pushThen("test", payload: [:])
-        let result = self.waitResult(expect, source: futurePush) {
-            futurePush.push.trigger("error", payload: [:])
+        let push = self.channel.push("test", payload: [:])
+        let result = self.waitPushResult(expect, source: push.eraseToAnyPublisher()) {
+            push.trigger("error", payload: [:])
         }
         
         // then
@@ -149,9 +149,9 @@ extension ChannelCombineExtensionsTests {
         self.channel.joinedOnce = true
         
         // when
-        let futurePush = self.channel.pushThen("test", payload: [:])
-        let result = self.waitResult(expect, source: futurePush) {
-            futurePush.push.trigger("timeout", payload: [:])
+        let push = self.channel.push("test", payload: [:])
+        let result = self.waitPushResult(expect, source: push.eraseToAnyPublisher()) {
+            push.trigger("timeout", payload: [:])
         }
         
         // then
