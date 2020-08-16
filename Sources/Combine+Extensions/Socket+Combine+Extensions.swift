@@ -22,75 +22,67 @@ public enum SocketStatusEvent {
 // MARK: - SocketEventSubecription
 
 @available(iOS 13.0, *)
-extension Publishers {
+class SocketEventSubscription<O, S: Subscriber>: Subscription where S.Input == O, S.Failure == Never {
     
-    class SocketEventSubscription<O, S: Subscriber>: Subscription where S.Input == O, S.Failure == Never {
-        
-        typealias Listening = (Socket, @escaping (O) -> Void) -> Void
-        
-        private weak var socket: Socket?
-        private var subscriber: S?
-        private let listening: Listening
-        
-        init(socket: Socket, listening: @escaping Listening, subscriber: S) {
-            self.socket = socket
-            self.listening = listening
-            self.subscriber = subscriber
-            
-            self.listenSocketEvents()
-        }
-        
-        func request(_ demand: Subscribers.Demand) { }
-        
-        func cancel() {
-            subscriber = nil
-        }
-        
-        private func listenSocketEvents() {
-            guard let subscriber = self.subscriber, let socket = self.socket else { return }
-            self.listening(socket) { output in
-                _ = subscriber.receive(output)
-            }
+    typealias Listening = (Socket, @escaping (O) -> Void) -> Void
+    
+    private weak var socket: Socket?
+    private var subscriber: S?
+    private let listening: Listening
+    
+    init(socket: Socket, listening: @escaping Listening, subscriber: S) {
+        self.socket = socket
+        self.listening = listening
+        self.subscriber = subscriber
+    }
+    
+    func request(_ demand: Subscribers.Demand) {
+        self.listenSocketEvents()
+    }
+    
+    func cancel() {
+        subscriber = nil
+    }
+    
+    private func listenSocketEvents() {
+        guard let subscriber = self.subscriber, let socket = self.socket else { return }
+        self.listening(socket) { output in
+            _ = subscriber.receive(output)
         }
     }
 }
-
 
 // MARK: - SocketStatusEventPublisher
 
 @available(iOS 13.0, *)
-extension Publishers {
+internal struct SocketStatusEventPublisher: Publisher {
     
-    internal struct SocketStatusEventPublisher: Publisher {
+    typealias Output = SocketStatusEvent
+    typealias Failure = Never
+    
+    private let socket: Socket
+    
+    internal init(socket: Socket) {
+        self.socket = socket
+    }
+    
+    internal func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
         
-        typealias Output = SocketStatusEvent
-        typealias Failure = Never
-        
-        private let socket: Socket
-        
-        internal init(socket: Socket) {
-            self.socket = socket
-        }
-        
-        internal func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
-            
-            let listenStatusEvents: (Socket, @escaping (SocketStatusEvent) -> Void) -> Void = { socket, callback in
-                socket.onOpen {
-                    callback(.onOpen)
-                }
-                socket.onClose {
-                    callback(.onClose)
-                }
-                socket.onError { error in
-                    callback(.onError(error))
-                }
+        let listenStatusEvents: (Socket, @escaping (SocketStatusEvent) -> Void) -> Void = { socket, callback in
+            socket.onOpen {
+                callback(.onOpen)
             }
-            let subscription = SocketEventSubscription(socket: socket, listening: listenStatusEvents, subscriber: subscriber)
-            subscriber.receive(subscription: subscription)
+            socket.onClose {
+                callback(.onClose)
+            }
+            socket.onError { error in
+                callback(.onError(error))
+            }
         }
+        let subscription = SocketEventSubscription(socket: socket, listening: listenStatusEvents, subscriber: subscriber)
+        subscriber.receive(subscription: subscription)
     }
 }
-
 
 // MARK: - SocketMessageEventPublisher
 
@@ -145,8 +137,8 @@ extension Socket {
 @available(iOS 13.0, *)
 extension SocketPublishers {
     
-    internal var _socketEvents: Publishers.SocketStatusEventPublisher {
-        return Publishers.SocketStatusEventPublisher(socket: self.socket)
+    internal var _socketEvents: SocketStatusEventPublisher {
+        return SocketStatusEventPublisher(socket: self.socket)
     }
     
     public var statusEvents: AnyPublisher<SocketStatusEvent, Never> {

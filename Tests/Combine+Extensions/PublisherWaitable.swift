@@ -37,10 +37,10 @@ extension PublisherWaitable where Self: XCTestCase {
         return outputs
     }
     
-    func waitResult(_ expect: XCTestExpectation,
-                    source: FuturePush,
-                    timeout: TimeInterval = 0.001,
-                    action: () -> Void) -> Result<Message, Error>? {
+    func waitPushResult(_ expect: XCTestExpectation,
+                        source: AnyPublisher<Message, Error>,
+                        timeout: TimeInterval = 0.001,
+                        action: () -> Void) -> Result<Message, Error>? {
         var result: Result<Message, Error>?
         source
             .sink(receiveCompletion: { complete in
