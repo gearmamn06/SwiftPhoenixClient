@@ -12,32 +12,40 @@ import Combine
 // MARK: - Channel Event Subscription
 
 @available(iOS 13.0, *)
-class ChannelEventSubscription<O, S: Subscriber>: Subscription where S.Input == O, S.Failure == Never {
-    
-    typealias Listening = (Channel, @escaping (O) -> Void) -> Void
+class ChannelEventSubscription<S: Subscriber>: Subscription, DemandBasePublishing where S.Input == Message, S.Failure == Never {
     
     private weak var channel: Channel?
     private var subscriber: S!
-    private let listening: Listening
+    private let event: String
+    var publishedElementCount: Int = 0
+    var currentDemand: Subscribers.Demand!
+    private let lock = NSRecursiveLock()
     
-    init(channel: Channel, listening: @escaping Listening, subscriber: S) {
+    init(channel: Channel, event: String, subscriber: S) {
         self.channel = channel
-        self.listening = listening
+        self.event = event
         self.subscriber = subscriber
-    }
-    
-    func request(_ demand: Subscribers.Demand) {
+        
         self.listenChannelEvents()
     }
     
+    func request(_ demand: Subscribers.Demand) {
+        self.lock.lock()
+        self.publishedElementCount = 0
+        self.currentDemand = demand
+        self.lock.unlock()
+    }
+    
     func cancel() {
+        self.lock.lock()
         self.subscriber = nil
+        self.lock.unlock()
     }
     
     private func listenChannelEvents() {
-        guard let subscriber = self.subscriber, let channel = channel else { return }
-        self.listening(channel) { output in
-            _ = subscriber.receive(output)
+        channel?.on(self.event) { [weak self] message in
+            guard let self = self, let subscriber = self.subscriber else { return }
+            self.publishElementOrNot(subscriber, element: message)
         }
     }
 }
@@ -61,14 +69,7 @@ struct ChannelEventPublisher: Publisher {
     
     func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
         
-        let event = self.event
-        let listenEvents: (Channel, @escaping (Message) -> Void) -> Void = { channel, callback in
-            channel.on(event) { message in
-                callback(message)
-            }
-        }
-        
-        let subscription = ChannelEventSubscription(channel: self.channel, listening: listenEvents, subscriber: subscriber)
+        let subscription = ChannelEventSubscription(channel: self.channel, event: self.event, subscriber: subscriber)
         subscriber.receive(subscription: subscription)
     }
 }
